@@ -1,0 +1,195 @@
+# This is the OpenAPI specification for your service. It is used to generate the client code.
+# To generate the server code, use the Gradle task `openApiGenerate`. The 
+# generated code will be placed in `build/generate-resources/main`.
+#
+# We will evaluate you based on how well you design your API.
+# 1. How well it follows REST principles.
+# 2. How easy it is to understand and use.
+#
+# References
+# 1. https://swagger.io/specification/
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: User Service
+  license:
+    name: MIT
+servers:
+  - url: http://localhost
+paths:
+  /register:
+    post:
+      summary: Register
+      operationId: Register
+      requestBody:
+        description: RegisterBodyRequest
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBodyRequest'
+      responses:
+        '200':
+          description: Register
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterSuccessResponse"
+        '400':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /login:
+    post:
+      summary: Login
+      operationId: Login
+      requestBody:
+        description: LoginBodyRequest
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBodyRequest'
+      responses:
+        '200':
+          description: Register
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccessResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /profile:
+    get:
+      security:
+        - BearerAuth: []
+      summary: Profile
+      operationId: Profile
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileSuccessResponse"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      security:
+        - BearerAuth: []
+      summary: Update Profile
+      operationId: UpdateProfile
+      requestBody:
+        description: LoginBodyRequest
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileBodyRequest'
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileSuccessResponse"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    RegisterBodyRequest:
+      type: object
+      required:
+        - phone
+        - full_name
+        - password
+      properties:
+        phone:
+          type: string
+        full_name:
+          type: string
+        password:
+          type: string
+    RegisterSuccessResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+    LoginBodyRequest:
+      type: object
+      required:
+        - phone
+        - password
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+    LoginSuccessResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+    ProfileSuccessResponse:
+      type: object
+      properties:
+        phone:
+          type: string
+        full_name:
+          type: string
+    UpdateProfileBodyRequest:
+      type: object
+      required:
+        - phone
+        - full_name
+      properties:
+        phone:
+          type: string
+        full_name:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+          

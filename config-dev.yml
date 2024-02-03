@@ -1,0 +1,15 @@
+database:
+  driver: postgres
+  host: 172.25.133.211
+  port: 5432
+  username: postgres
+  password: postgres
+  dbname: database
+  schemaname: public
+
+
+jwt:
+  secret: adPcd+mrzpsZEkKxsOhgcw==
+  access-token-expiry-in-second: 86400
+  refresh-token-expiry-in-second: 86400
+  file-path-private-key: "private_key"

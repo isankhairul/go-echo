@@ -11,9 +11,9 @@ import (
 
 type RepositoryInterface interface {
 	GetTestById(ctx context.Context, input GetTestByIdInput) (output GetTestByIdOutput, err error)
-	UsersCreate(ctx context.Context, Users entity.Users) (output *int, err error)
+	UsersCreate(ctx context.Context, Users entity.Users) (output *int64, err error)
 	UsersFirstByPhone(ctx context.Context, phone string) (output *entity.Users, err error)
-	UsersCountByPhone(ctx context.Context, phone string) (output *int64, err error)
-	UsersFirstByID(ctx context.Context, id uint64) (output *entity.Users, err error)
-	UsersUpdateByID(ctx context.Context, id uint64, Users entity.Users) (output *uint64, err error)
+	UsersCountByPhone(ctx context.Context, phone string) (output int64, err error)
+	UsersFirstByID(ctx context.Context, id int64) (output *entity.Users, err error)
+	UsersUpdateByID(ctx context.Context, id int64, Users entity.Users) (output *int64, err error)
 }

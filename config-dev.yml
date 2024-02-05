@@ -12,4 +12,5 @@ jwt:
   secret: adPcd+mrzpsZEkKxsOhgcw==
   access-token-expiry-in-second: 86400
   refresh-token-expiry-in-second: 86400
-  file-path-private-key: "private_key"
+  file-path-private-key: "../private_key"
+  # if go test value must be ../private_key

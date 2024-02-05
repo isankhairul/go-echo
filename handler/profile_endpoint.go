@@ -4,35 +4,22 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"go-echo/generated"
-	"go-echo/model/request"
+	service2 "go-echo/service"
 	"net/http"
 )
 
 // (GET /profile)
 func (s *Server) Profile(ctx echo.Context) error {
-	intStatusForbiddenRQ := int(http.StatusForbidden)
-	respErr := generated.ErrorResponse{Code: &intStatusForbiddenRQ}
-
 	privateClaim := ctx.Get(JWTClaimsContextKey).(map[string]interface{})
 	id := privateClaim["id"].(float64)
 
-	// get user
-	user, err := s.Repository.UsersFirstByID(context.Background(), uint64(id))
-	if err != nil {
-		respErr.Message = err.Error()
-		return ctx.JSON(intStatusForbiddenRQ, respErr)
-	}
-	if user == nil {
-		respErr.Message = "user not found"
-		return ctx.JSON(intStatusForbiddenRQ, respErr)
+	service := service2.NewProfileService(s.Repository)
+	respSuccess, repError := service.Detail(context.Background(), int64(id))
+	if repError != nil {
+		return ctx.JSON(*repError.Code, *repError)
 	}
 
-	response := generated.ProfileSuccessResponse{
-		Phone:    &user.Phone,
-		FullName: &user.FullName,
-	}
-
-	return ctx.JSON(http.StatusOK, response)
+	return ctx.JSON(http.StatusOK, *respSuccess)
 }
 
 // (PUT /profile)
@@ -40,7 +27,7 @@ func (s *Server) UpdateProfile(ctx echo.Context) error {
 	intStatusForbiddenRQ := int(http.StatusForbidden)
 	respErr := generated.ErrorResponse{Code: &intStatusForbiddenRQ}
 
-	var input request.UpdateProfileRQ
+	var input generated.UpdateProfileBodyRequest
 	err := ctx.Bind(&input)
 	if err != nil {
 		respErr.Message = err.Error()
@@ -50,43 +37,11 @@ func (s *Server) UpdateProfile(ctx echo.Context) error {
 	privateClaim := ctx.Get(JWTClaimsContextKey).(map[string]interface{})
 	id := privateClaim["id"].(float64)
 
-	// get user
-	user, err := s.Repository.UsersFirstByID(context.Background(), uint64(id))
-	if err != nil {
-		respErr.Message = err.Error()
-		return ctx.JSON(intStatusForbiddenRQ, respErr)
-	}
-	if user == nil {
-		respErr.Message = "user not found"
-		return ctx.JSON(intStatusForbiddenRQ, respErr)
+	service := service2.NewProfileService(s.Repository)
+	respSuccess, repError := service.Update(context.Background(), int64(id), input)
+	if repError != nil {
+		return ctx.JSON(*repError.Code, *repError)
 	}
 
-	// check phone already exist
-	countUser, err := s.Repository.UsersCountByPhone(context.Background(), input.Phone)
-	if err != nil {
-		respErr.Message = err.Error()
-		return ctx.JSON(http.StatusBadRequest, respErr)
-	}
-	if countUser != nil && (*countUser > 0 && user.Phone != input.Phone) {
-		intStatusConflict := int(http.StatusConflict)
-		respErr.Message = "phone already exists"
-		respErr.Code = &intStatusConflict
-		return ctx.JSON(http.StatusConflict, respErr)
-	}
-
-	// update user
-	user.Phone = input.Phone
-	user.FullName = input.FullName
-	_, err = s.Repository.UsersUpdateByID(context.Background(), uint64(id), *user)
-	if err != nil {
-		respErr.Message = err.Error()
-		return ctx.JSON(http.StatusBadRequest, respErr)
-	}
-
-	response := generated.ProfileSuccessResponse{
-		Phone:    &user.Phone,
-		FullName: &user.FullName,
-	}
-
-	return ctx.JSON(http.StatusOK, response)
+	return ctx.JSON(http.StatusOK, *respSuccess)
 }

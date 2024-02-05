@@ -151,6 +151,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
     LoginBodyRequest:
       type: object
       required:
@@ -166,6 +167,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
         access_token:
           type: string
         refresh_token:
